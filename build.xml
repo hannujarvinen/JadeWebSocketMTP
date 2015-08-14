@@ -1,0 +1,75 @@
+<project name="JadeWebSocketMTP" default="compile" basedir=".">
+
+  <property environment="env"/>
+  <property name="version" value="0.1"/>
+
+  <property name="src" value="src"/>
+  <property name="current" value="."/>
+  <property name="build" value="build"/>
+  <property name="lib" value="lib"/>
+  <property name="jade-home" value="../"/>
+  <property name="jade-lib" value="../lib/"/>
+
+      <path id="WebSocketMTP.classpath">
+        <pathelement location="${current}"/>
+        <pathelement location="${build}"/>
+        <fileset dir="lib">
+            <include name="*.jar" />
+        </fileset>
+        <fileset dir="${jade-home}/lib">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the directories structure used to store files -->
+    <mkdir dir="${lib}"/>
+    <mkdir dir="${build}"/>
+  </target>
+  
+
+  <!-- Compile the java code from ${src} into ${build} -->
+  <target name="compile" depends="init">
+    <javac srcdir="${src}" destdir="${build}" nowarn="off" optimize="on" deprecation="on">
+	<classpath refid="WebSocketMTP.classpath"/>
+	</javac>
+  </target>
+
+  <!-- Make jars file and put in ${lib} -->
+  <target name="lib" depends="compile">
+    <jar jarfile="${lib}/JadeWebSocketMTP.jar">
+      <fileset dir="${build}" />
+    </jar>
+  </target>
+ 
+  <!-- Copy jar files from ${lib} to Jade lib folder-->
+  <target name="install" depends="init, compile, lib">
+    <copy todir="${jade-lib}">
+      <fileset dir="${lib}" />
+    </copy>
+  </target>
+ 
+  <!-- Make distribution zip file and put in ${dist} -->
+  <target name="dist" depends="lib">
+    <jar jarfile="../JadeWebSocketMTP_${version}.zip" basedir="../">
+      <include name="JadeWebSocketMTP/*"/>
+      <include name="JadeWebSocketMTP/Licenses/**"/>
+      <include name="JadeWebSocketMTP/src/**"/>
+      <include name="JadeWebSocketMTP/lib/**"/>
+    </jar>
+  </target>
+ 
+  <target name="all" depends="init, compile, lib, dist"/>
+ 
+  <!-- delete ${build} and ${lib} directories -->
+  <target name="clean" description="clean up">
+    <!-- Delete the ${build} directory tree -->
+    <delete includeEmptyDirs="true" quiet="true">
+      <fileset dir="${build}"/>
+      <fileset dir="${lib}" includes="JadeWebSocketMTP.jar"/>
+    </delete>
+  </target>
+
+</project>
